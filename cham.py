@@ -22,7 +22,7 @@ class Playtime(unittest.TestCase):
         # TOGGLE THIS, TO PHASE 1.3.4 OR NOT TO PHASE 1.3.4
         is_onedotthreedotfour = True # Default to False
         # TOGGLE THIS, TO GERMAN OR NOT TO GERMAN
-        is_german = False # Default to False
+        is_german = True # Default to False
 
         # Variables
         my_first_name = 'dee'
@@ -40,9 +40,9 @@ class Playtime(unittest.TestCase):
 
         # Determine if Phase 1.3.4, or not, based on Toggle above and set my_url
         if is_onedotthreedotfour == True:
-            my_url = ['https://stg3www.myliftmaster.com/', \
+            my_url = ['https://stg3www.myliftmaster.eu/', \
                 'https://stg3www.mychamberlain.com/', \
-                'https://stg3www.myliftmaster.eu/', \
+                'https://stg3www.myliftmaster.com/', \
                 'https://stg3www.mychamberlain.eu/'] # Phase 1.3.4 Site URLs
             # Determine if German, or not, based on Toggle above and set my_country
             if is_german == True:
@@ -63,11 +63,16 @@ class Playtime(unittest.TestCase):
             # Create driver and open page
             #self.driver = webdriver.Firefox() # Only need this if removing the setUp(self) and tearDown(self)
             driver = self.driver
-            driver.get(my_url[i] + "CreateAccount.aspx")
+            driver.get(my_url[i])
 
             # Change site to German, if is_german is true
             if is_german == True:
                 driver.find_element_by_xpath("//a[text()='German']").click()
+
+            # Click Sign Up/Registrieren link
+            time.sleep(2)
+            WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'username')))
+            driver.find_element_by_class_name("btn-action-alt").click()
 
             # Fill out some information on the first page of registration
             WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'new_first_name')))
