@@ -22,7 +22,7 @@ class Playtime(unittest.TestCase):
         # TOGGLE THIS, TO PHASE 1.3.4 OR NOT TO PHASE 1.3.4
         is_onedotthreedotfour = True # Default to False
         # TOGGLE THIS, TO GERMAN OR NOT TO GERMAN
-        is_german = True # Default to False
+        is_german = False # Default to False
 
         # Variables
         my_first_name = 'dee'
@@ -40,9 +40,9 @@ class Playtime(unittest.TestCase):
 
         # Determine if Phase 1.3.4, or not, based on Toggle above and set my_url
         if is_onedotthreedotfour == True:
-            my_url = ['https://stg3www.myliftmaster.eu/', \
+            my_url = ['https://stg3www.myliftmaster.com/', \
                 'https://stg3www.mychamberlain.com/', \
-                'https://stg3www.myliftmaster.com/', \
+                'https://stg3www.myliftmaster.eu/', \
                 'https://stg3www.mychamberlain.eu/'] # Phase 1.3.4 Site URLs
             # Determine if German, or not, based on Toggle above and set my_country
             if is_german == True:
@@ -137,10 +137,7 @@ class Playtime(unittest.TestCase):
                 print ' Activation URL changed to: ' + activation_url
 
             # Navigate to the activation URL in the first broswer.
-            if is_german == True:
-                driver.get(activation_url_german)
-            else:
-                driver.get(activation_url)
+            driver.get(activation_url)
 
             # Input the password to validate login and hit login
             driver.find_element_by_id('password').send_keys(my_password)
