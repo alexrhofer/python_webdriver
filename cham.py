@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.common.by import By
 from datetime import datetime as dt
@@ -10,13 +11,15 @@ import unittest
 import time
 
 # Yes, I know I could refactor this much better...
-# - dx
+#  - dx
 class Playtime(unittest.TestCase):
 
     def setUp(self):
+
+        # Create driver and driver2, TOGGLE CHROME OR FIREFOX!
         self.driver = webdriver.Firefox()
         self.driver2 = webdriver.Firefox()
-        
+
     def test_1(self):
 
         # TOGGLE THIS, TO PHASE 1.3.4 OR NOT TO PHASE 1.3.4
@@ -39,20 +42,20 @@ class Playtime(unittest.TestCase):
         selected_country = "N/A" # Default to None
 
         # Determine if Phase 1.3.4, or not, based on Toggle above and set my_url
-        if is_onedotthreedotfour == True:
-            my_url = ['https://stg3www.myliftmaster.com/', \
-                'https://stg3www.mychamberlain.com/', \
-                'https://stg3www.myliftmaster.eu/', \
-                'https://stg3www.mychamberlain.eu/'] # Phase 1.3.4 Site URLs
+        if is_onedotthreedotfour:
+            my_url = ['http://stg3www.myliftmaster.com/', \
+                'http://stg3www.myliftmaster.eu/', \
+                'http://stg3www.mychamberlain.com/', \
+                'http://stg3www.mychamberlain.eu/'] # Phase 1.3.4 Site URLs
             # Determine if German, or not, based on Toggle above and set my_country
-            if is_german == True:
-                my_country = ['Belgium', 'Canada', 'France', 'Deutschland', 'Italy', 'Mexico', \
-                    'Netherlands', 'Spain', 'United Kingdom', 'United States'] # Set to German values
+            if is_german:
+                my_country = ['Belgien', 'Deutschland', 'Frankreich', u'Gro\u00DFbritannien', 'Italien', 'Kanada', \
+                    'Mexiko', 'Niederlande', 'Spanien', 'Vereinigte Staaten von Amerika'] # Set to German values
             else:
                 my_country = ['Belgium', 'Canada', 'France', 'Germany', 'Italy', 'Mexico', \
                     'Netherlands', 'Spain', 'United Kingdom', 'United States'] # Set to English values
         else:
-            my_url = ['https://www.myliftmaster.com/'] # Phase 1.3.4
+            my_url = ['http://www.myliftmaster.com/'] # Phase 1.3.4
 
         # Print out Toggles above.
         print "\n**** INITIALIZING TESTS FOR: Phase 1.3.4 == " + str(is_onedotthreedotfour) + \
@@ -61,13 +64,16 @@ class Playtime(unittest.TestCase):
         # Loop for each url
         for i in range(len(my_url)):
             # Create driver and open page
-            #self.driver = webdriver.Firefox() # Only need this if removing the setUp(self) and tearDown(self)
             driver = self.driver
             driver.get(my_url[i])
 
             # Change site to German, if is_german is true
-            if is_german == True:
-                driver.find_element_by_xpath("//a[text()='German']").click()
+            #  Need try block, in case site is already set to German
+            if is_german:
+                try:
+                    driver.find_element_by_xpath("//a[text()='German']").click()
+                except NoSuchElementException:
+                    driver.find_element_by_xpath("//a[text()='Deutsch']").click()
 
             # Click Sign Up/Registrieren link
             time.sleep(2)
@@ -81,22 +87,21 @@ class Playtime(unittest.TestCase):
             driver.find_element_by_id('new_password').send_keys(my_password)
             driver.find_element_by_id('new_password_verify').send_keys(my_password)
             # Set Country dropdown to random my_country (this only applies to Phase 1.3.4, 
-            # since 1.3.3 does not have this feature)
-            if is_onedotthreedotfour == True:
+            #  since 1.3.3 does not have this feature)
+            if is_onedotthreedotfour:
                 random_num = random.randint(0, 9)
                 selected_country = my_country[random_num]
                 countryOption = Select(driver.find_element_by_id('new_country_code'))
                 countryOption.select_by_visible_text(selected_country)
 
             # Create new driver to handle getting e-mails from www.mintemail.com
-            #self.driver2 = webdriver.Firefox() # Only need this if removing the setUp(self) and tearDown(self)
             driver2 = self.driver2
             driver2.get('http://www.mintemail.com/')
             WebDriverWait(driver2, 20).until(EC.visibility_of_element_located((By.ID, 'emailaddress')))
 
             # Grab my_email from the second browser
             my_email = driver2.find_element_by_id('emailaddress').text.split()[0]
-            if is_onedotthreedotfour == True:
+            if is_onedotthreedotfour:
                 print ' The site being tested is: ' + my_url[i] + " at " + dt.now().strftime("%d/%m, %H:%M:%S") + \
                     '\n The email being tested is: ' + my_email + "\n The Country selection is set to: " + \
                     selected_country
@@ -109,7 +114,7 @@ class Playtime(unittest.TestCase):
             # Check the terms box and hit the next button
             driver.find_element_by_id('terms_check').click()
             time.sleep(2)
-            if is_german == True:
+            if is_german:
                 driver.find_element_by_xpath("//a[text()='Weiter']").click()
             else:
                 driver.find_element_by_xpath("//a[text()='Next']").click()
@@ -120,7 +125,7 @@ class Playtime(unittest.TestCase):
             activation_link_german = u"//a[text()='Klicken Sie hier, um Ihre Registrierung abzuschlie\u00DFen.']"
 
             # Wait for the activation link to appear and copy it, then quit the browser
-            if is_german == True:
+            if is_german:
                 WebDriverWait(driver2, 300).until(EC.visibility_of_element_located((By.XPATH, activation_link_german)))
                 activation_url = driver2.find_element_by_xpath(activation_link_german).get_attribute('href')
             else:
@@ -128,7 +133,7 @@ class Playtime(unittest.TestCase):
                 activation_url = driver2.find_element_by_xpath(activation_link).get_attribute('href')
 
             # Change URL so it goes to Staging server of 'stg3www'. Only needed if URL is not pointing to correct server...
-            # To debug, print out pre-change URL
+            #  To debug, print out pre-change URL
             print ' Activation URL: ' + activation_url
             if 'dev' in activation_url:
                 param_url, value_url = activation_url.split('dev',1)
@@ -162,7 +167,7 @@ class Playtime(unittest.TestCase):
             # Log out
             time.sleep(5)
             WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'logoutLink')))
-            if is_german == True:
+            if is_german:
                 driver.find_element_by_xpath("//a[text()='Abmelden']").click()
             else:
                 driver.find_element_by_xpath("//a[text()='Logout']").click()
@@ -174,20 +179,20 @@ class Playtime(unittest.TestCase):
             #driver.find_element_by_xpath(u"//a[text()='Gehen Sie zu \u201EAnmelden\"']")
 
             # Log back in
-            time.sleep(2)
+            time.sleep(5)
             WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'username')))
             driver.find_element_by_id('username').send_keys(my_email)
             driver.find_element_by_id('password').send_keys(my_password)
-            if is_german == True:
+            if is_german:
                 driver.find_element_by_xpath("//a[text()='Anmelden']").click()
             else:
                 driver.find_element_by_xpath("//a[text()='Login']").click()
 
             # Open the User account management modal.
-            # Super pro workaround because I can't click after waiting for it 
-            # because it's there but it does nothing for 5 seconds
-            time.sleep(5)
-            if is_german == True:
+            #  Super pro workaround because I can't click after waiting for it 
+            #  because it's there but it does nothing for 5 seconds
+            time.sleep(10)
+            if is_german:
                 user_account = "//a[text()='+ Benutzer bearbeiten']"
             else:
                 user_account = "//a[text()='+ Edit User']"
@@ -205,14 +210,12 @@ class Playtime(unittest.TestCase):
             # Print out status and time amount, if successful
             print " TEST SUCCESS for " + my_url[i] + "! End time = " + dt.now().strftime("%d/%m, %H:%M:%S") + "\n"
 
-            # Stop driver and driver2. Only need this if removing the setUp(self) and tearDown(self)
-            #driver.quit()
-            #driver2.quit()
-
             # Sleep, to allow deletion of account to redirect back to login page
             time.sleep(5)
 
     def tearDown(self):
+
+        # Close driver and driver2
         self.driver.quit()
         self.driver2.quit()
 
