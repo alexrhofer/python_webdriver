@@ -43,10 +43,10 @@ class Playtime(unittest.TestCase):
 
         # Determine if Phase 1.3.4, or not, based on Toggle above and set my_url
         if is_onedotthreedotfour:
-            my_url = ['http://stg3www.myliftmaster.com/', \
-                'http://stg3www.myliftmaster.eu/', \
-                'http://stg3www.mychamberlain.com/', \
-                'http://stg3www.mychamberlain.eu/'] # Phase 1.3.4 Site URLs
+            my_url = ['http://www.myliftmaster.com/', \
+                'http://www.myliftmaster.eu/', \
+                'http://www.mychamberlain.com/', \
+                'http://www.mychamberlain.eu/'] # Phase 1.3.4 Site URLs
             # Determine if German, or not, based on Toggle above and set my_country
             if is_german:
                 my_country = ['Belgien', 'Deutschland', 'Frankreich', u'Gro\u00DFbritannien', 'Italien', 'Kanada', \
@@ -137,7 +137,7 @@ class Playtime(unittest.TestCase):
             print ' Activation URL: ' + activation_url
             if 'dev' in activation_url:
                 param_url, value_url = activation_url.split('dev',1)
-                activation_url = 'http://stg3' + value_url
+                activation_url = 'http://' + value_url
                 # To debug, print out post-change URL
                 print ' Activation URL changed to: ' + activation_url
 
